@@ -42,9 +42,10 @@ for user in faketrump:
 i = 0
 
 for tweet in outtweets:
-	text = tweet[1]
-	try:
-		cur.execute("INSERT INTO fake_tweets(tweet) VALUES('%s')" % (text))
-		print(text)
-	except Exception as e:
-		print("meme")
+	with con:
+		text = tweet[1]
+		try:
+			cur.execute("INSERT INTO fake_tweets(tweet) VALUES('%s')" % (text))
+			print(text)
+		except Exception as e:
+			print("meme")
