@@ -63,6 +63,7 @@ $(document).ready(function() {
 		newChoice.setAttribute('value', '' + i);
 		newChoice.setAttribute('class', "choice btn btn-lg btn-primary btn-block");
 		newChoice.style.backgroundColor = "2C5D9D";
+		newChoice.setAttribute('style', 'white-space: normal;');
 		$('#choices').append(newChoice);
 	}
 	
