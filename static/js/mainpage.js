@@ -17,13 +17,7 @@ function shuffle(a) {
 }
 
 function resetColors() {
-	for(var i = 0; i < num_fake_tweets + 1; i++){
-		var id = 'choice_' + i;
-		console.log(id);
-		var property = document.getElementById(id);
-		console.log(property);
-		property.style.backgroundColor = "#2C59D";
-	}
+	$('.choice').css('background-color', '#2C5D9D');
 }
 
 function newGame() {
@@ -32,19 +26,11 @@ function newGame() {
 	resetColors();
 	$.get('/get_tweets?num_tweets=' + num_fake_tweets, function(data) {
 		var fake_tweets = data.fake_tweets;
-		console.log(fake_tweets);
 		for (var i = 0; i < fake_tweets.length; i++) {
 			$('#choice_' + indexes[i]).html(fake_tweets[i].Tweet);
-			var id = 'choice_' + i;
-			var property = document.getElementById(id);
-			console.log(property);
-			property.style.backgroundColor = "#2C5D9D";
 		}
 		correctAnswer = indexes[num_fake_tweets];
-		var property = document.getElementById('choice_' + correctAnswer);
-                console.log(property);
 		$('#choice_' + correctAnswer).html(data.real_tweet.Tweet);
-		property.style.backgroundColor = "#2C5D9D";
 	})
 	.done(function() {
 		console.log("Sending request to server...");
