@@ -64,7 +64,10 @@ async def get_tweets_mobile(request, methods=['GET','POST']):
 
 	#ca = request.cookies.get('correct_answer')
 	ca = request['session'].get('correct_answer')
-	print(ca)
+	body = request.args['Body'][0]
+	if body.lower() == 'score':
+		print(" [*] Sending score")
+		return text("Current Score: %d" % request['session'].get('score', 0))
 	if ca == None:
 		print(" [*] Starting new game.")
 		real_tweet = get_real_tweet()
@@ -78,27 +81,25 @@ async def get_tweets_mobile(request, methods=['GET','POST']):
 		tweets = fake_tweets
 		random.shuffle(tweets)
 		correct_index = random.randint(0,num_fake_tweets)
-		#request.cookies['correct_answer'] = correct_index
 		request['session']['correct_answer'] = correct_index
 		tweets.insert(correct_index,real_tweet)
 
 		resp_str = "Which tweet is the real tweet?\n"
 		for i,tweet in enumerate(tweets):
-			resp_str += '%d) %s\n' % (i,tweet)
+			resp_str += '%d) %s\n' % (i,tweet['Tweet'].decode('utf-8'))
 
 		return text(resp_str)
 	else:
 		print(" [*] Existing game found.")
-		#ca = int(request.cookies.get('correct_answer'))
 		ca = int(request['session'].get('correct_answer'))
-		body = request.args['Body'][0]
 		try:
 			user_answer = int(body)
 			if user_answer == ca:
-				#request.cookies['correct_answer'] = None
 				request['session']['correct_answer'] = None
+				request['session']['score'] = request['session'].get('score', 0)+1
 				return text("Correct! Make HackNY Great Again")
 			else:
+				request['session']['score'] = 0
 				return text("Fake news! Bad!")
 		except:
 			return text("Invalid input. Please try again")
