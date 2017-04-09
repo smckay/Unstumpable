@@ -46,6 +46,7 @@ $(document).ready(function() {
 		newChoice.setAttribute('id', 'choice_' + i);
 		newChoice.setAttribute('value', '' + i);
 		newChoice.setAttribute('class', "choice btn btn-lg btn-primary btn-block");
+		newChoice.setAttribute('style', 'white-space: normal;');
 		$('#choices').append(newChoice);
 	}
 	
