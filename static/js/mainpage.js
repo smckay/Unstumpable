@@ -16,19 +16,35 @@ function shuffle(a) {
 	}
 }
 
+function resetColors() {
+	for(var i = 0; i < num_fake_tweets + 1; i++){
+		var id = 'choice_' + i;
+		console.log(id);
+		var property = document.getElementById(id);
+		console.log(property);
+		property.style.backgroundColor = "#2C59D";
+	}
+}
+
 function newGame() {
 	indexes = Array.from(Array(num_fake_tweets+1).keys());
 	shuffle(indexes);
-
+	resetColors();
 	$.get('/get_tweets?num_tweets=' + num_fake_tweets, function(data) {
 		var fake_tweets = data.fake_tweets;
 		console.log(fake_tweets);
 		for (var i = 0; i < fake_tweets.length; i++) {
 			$('#choice_' + indexes[i]).html(fake_tweets[i].Tweet);
+			var id = 'choice_' + i;
+			var property = document.getElementById(id);
+			console.log(property);
+			property.style.backgroundColor = "#2C5D9D";
 		}
-
-		$('#choice_' + indexes[num_fake_tweets]).html(data.real_tweet.Tweet);
 		correctAnswer = indexes[num_fake_tweets];
+		var property = document.getElementById('choice_' + correctAnswer);
+                console.log(property);
+		$('#choice_' + correctAnswer).html(data.real_tweet.Tweet);
+		property.style.backgroundColor = "#2C5D9D";
 	})
 	.done(function() {
 		console.log("Sending request to server...");
@@ -46,18 +62,20 @@ $(document).ready(function() {
 		newChoice.setAttribute('id', 'choice_' + i);
 		newChoice.setAttribute('value', '' + i);
 		newChoice.setAttribute('class', "choice btn btn-lg btn-primary btn-block");
+		newChoice.style.backgroundColor = "2C5D9D";
 		$('#choices').append(newChoice);
 	}
 	
 	$('.choice').click(function(e) {
 		var target = e.target;
-
 		console.log(target);
 		if (target.getAttribute('value') == correctAnswer) {
-			alert("Correct! Make HackNY Great Again!");
+		        target.style.backgroundColor = "#00FF00";			
+			//alert("Correct! Make HackNY Great Again!");
 			score += 1;
 		} else {
-			alert("Fake news! Bad!");
+			target.style.backgroundColor = "#FF0000";
+			//alert("Fake news! Bad!");
 			score = 0;
 		}
 	});
