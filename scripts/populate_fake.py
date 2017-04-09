@@ -42,6 +42,8 @@ for user in faketrump:
 i = 0
 
 for tweet in outtweets:
+	if "RT" in tweet[1]:
+		continue
 	print(tweet)
 	with con:
 		text = tweet[1]
