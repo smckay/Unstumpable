@@ -1,4 +1,4 @@
-from sanic import Sanic
+from sanic import Sanic, response
 from sanic.response import json
 
 import pymysql as mdb
@@ -11,7 +11,15 @@ app = Sanic()
 
 @app.route('/')
 async def test(request):
-	return json({'hello': 'world'})
+	#return json({'hello': 'world'})
+	return await response.file('./static/templates/mainpage.html')
+
+#@app.route('/static/js/mainpage.js')
+#async def get_js(request):
+#	return await response.file('./static/js/mainpage.js')
+
+app.static('/js', './static/js')
+app.static('/css', './static/css')
 
 @app.route('/get_tweets')
 async def get_tweets(request, methods=['GET']):
