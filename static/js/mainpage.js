@@ -3,6 +3,8 @@ const num_fake_tweets = 3;
 var correctAnswer;
 var indexes;
 
+var score;
+
 // http://stackoverflow.com/a/6274381
 function shuffle(a) {
 	var j, x, i;
@@ -20,11 +22,12 @@ function newGame() {
 
 	$.get('/get_tweets?num_tweets=' + num_fake_tweets, function(data) {
 		var fake_tweets = data.fake_tweets;
+		console.log(fake_tweets);
 		for (var i = 0; i < fake_tweets.length; i++) {
-			$('#choice_' + i).html(fake_tweets[i].Tweet);
+			$('#choice_' + indexes[i]).html(fake_tweets[i].Tweet);
 		}
 
-		$('#choice_' + num_fake_tweets).html(data.real_tweet.Tweet);
+		$('#choice_' + indexes[num_fake_tweets]).html(data.real_tweet.Tweet);
 		correctAnswer = indexes[num_fake_tweets];
 	})
 	.done(function() {
@@ -36,7 +39,8 @@ function newGame() {
 }
 
 $(document).ready(function() {
-	console.log("meme");
+	score = 0;
+
 	for (var i = 0; i < num_fake_tweets+1; i++) {
 		var newChoice = document.createElement('button');
 		newChoice.setAttribute('id', 'choice_' + i);
@@ -45,10 +49,17 @@ $(document).ready(function() {
 		$('#choices').append(newChoice);
 	}
 	
-	$('button').click(function(e) {
+	$('.choice').click(function(e) {
 		var target = e.target;
 
 		console.log(target);
+		if (target.getAttribute('value') == correctAnswer) {
+			alert("Correct! Make HackNY Great Again!");
+			score += 1;
+		} else {
+			alert("Fake news! Bad!");
+			score = 0;
+		}
 	});
 
 	newGame();
