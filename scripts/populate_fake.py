@@ -1,12 +1,12 @@
 #used https://gist.github.com/yanofsky/5436496 as guideline
 import tweepy
-import MySQLdb as mdb
+import pymysql as mdb
 import sys
 
 con = mdb.connect('localhost', 'root', 'password1', 'unstumpable');
 cur = con.cursor()
 cur.execute("DROP TABLE IF EXISTS fake_tweets")
-cur.execute("CREATE TABLE fake_tweets(ID INT PRIMARY KEY AUTO_INCREMENT, \
+cur.execute("CREATE TABLE fake_tweets(ID BIGINT PRIMARY KEY, \
                  tweet BLOB, \
 		handle VARCHAR(255))")
 consumer_key = "YZjQNOxHfRdqvvgZGe186FmFJ"
@@ -42,10 +42,11 @@ for user in faketrump:
 i = 0
 
 for tweet in outtweets:
+	print(tweet)
 	with con:
 		text = tweet[1]
 		try:
-			cur.execute("INSERT INTO fake_tweets(tweet) VALUES('%s')" % (text))
+			cur.execute("INSERT INTO fake_tweets(tweet,handle,ID) VALUES('%s', '%s', %d);" % (tweet[1],tweet[2],int(tweet[0])))
 			print(text)
 		except Exception as e:
 			print("meme")

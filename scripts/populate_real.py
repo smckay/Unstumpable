@@ -1,12 +1,12 @@
 #used https://gist.github.com/yanofsky/5436496 as guideline
 import tweepy
-import MySQLdb as mdb
+import pymysql as mdb
 import sys
 
 con = mdb.connect('localhost', 'root', 'password1', 'unstumpable');
 cur = con.cursor()
 cur.execute("DROP TABLE IF EXISTS real_tweets")
-cur.execute("CREATE TABLE real_tweets(ID INT PRIMARY KEY AUTO_INCREMENT, \
+cur.execute("CREATE TABLE real_tweets(ID BIGINT PRIMARY KEY , \
                  tweet BLOB)")
 consumer_key = "YZjQNOxHfRdqvvgZGe186FmFJ"
 consumer_secret = "MaMXUIHuamKSo6VhoGgDWwJqeU1f4laBAUbN73FDG8EMh1WADC"
@@ -35,10 +35,11 @@ outtweets = [[tweet.id_str, tweet.text] for tweet in tweets]
 i = 0
 
 for tweet in outtweets:
+	print("Tweet: " + repr(tweet))
 	with con:
 		text = tweet[1]
 		try:
-			cur.execute("INSERT INTO real_tweets(tweet) VALUES('%s')" % (text))
+			cur.execute("INSERT INTO real_tweets(tweet,id) VALUES('%s', %d)" % (text,int(tweet[0])))
 			print(text)
 		except Exception as e:
 			print("meme")

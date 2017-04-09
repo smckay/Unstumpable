@@ -30,8 +30,6 @@ async def get_tweets(request, methods=['GET']):
 
 		cur.execute(real_tweet_q)
 		real_tweet = cur.fetchone()
-		# Delete later
-		#real_tweet = (1, "meme",)
 		if not real_tweet:
 			return json(error("Cannot retrieve real tweet data"))
 		else:
@@ -39,8 +37,6 @@ async def get_tweets(request, methods=['GET']):
 
 		cur.execute(fake_tweet_q)
 		fake_tweets = cur.fetchall()
-		# Delete later
-		#fake_tweets = [(2,"fake news",'fake',),(3,"bad!",'fake',)]
 		if len(fake_tweets) != num_tweets:
 			return json(error("Cannot retrieve fake tweet data"))
 		else:
