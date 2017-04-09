@@ -35,6 +35,8 @@ outtweets = [[tweet.id_str, tweet.text] for tweet in tweets]
 i = 0
 
 for tweet in outtweets:
+	if "RT" in tweet[1]:
+		continue
 	print("Tweet: " + repr(tweet))
 	with con:
 		text = tweet[1]
