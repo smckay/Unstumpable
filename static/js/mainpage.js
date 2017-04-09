@@ -42,10 +42,14 @@ function newGame() {
 	.fail(function() {
 		alert("Cannot contact server... Sorry!!!");
 	});
+	$('.choice').prop('disabled', false);
 }
 
 $(document).ready(function() {
 	score = 0;
+	setInterval(function() {
+		$('#score').html(score);
+	},500);
 
 	for (var i = 0; i < num_fake_tweets+1; i++) {
 		var newChoice = document.createElement('button');
@@ -61,7 +65,7 @@ $(document).ready(function() {
 		var target = e.target;
 		console.log(target);
 		if (target.getAttribute('value') == correctAnswer) {
-		        target.style.backgroundColor = "#00FF00";			
+			target.style.backgroundColor = "#00FF00";			
 			//alert("Correct! Make HackNY Great Again!");
 			score += 1;
 			console.log(realid);
@@ -70,6 +74,7 @@ $(document).ready(function() {
 			//$.get('/embed?id=' + realid, function(data) {
 			//	console.log(data.html);
 			//});
+			$('.choice').prop('disabled', true);
 		} else {
 			target.style.backgroundColor = "#FF0000";
 			//alert("Fake news! Bad!");
