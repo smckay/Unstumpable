@@ -62,7 +62,6 @@ async def get_tweets_mobile(request, methods=['GET','POST']):
 
 	num_fake_tweets = 3
 
-	#ca = request.cookies.get('correct_answer')
 	ca = request['session'].get('correct_answer')
 	body = request.args['Body'][0]
 	if body.lower() == 'score':
@@ -113,7 +112,7 @@ def get_real_tweet():
 		if not real_tweet:
 			return None
 		else:
-			return {'ID': real_tweet[0], 'Tweet': real_tweet[1], "Handle": 'realDonaldTrump'}
+			return {'ID': str(real_tweet[0]), 'Tweet': real_tweet[1], "Handle": 'realDonaldTrump'}
 			
 def get_fake_tweets(num_tweets):
 	fake_tweet_q = "SELECT ID, Tweet, Handle FROM fake_tweets ORDER BY RAND() LIMIT {};".format(num_tweets)
@@ -124,7 +123,7 @@ def get_fake_tweets(num_tweets):
 		if len(fake_tweets) != num_tweets:
 			return None
 		else:
-			return list(map(lambda x: {'ID': x[0], 'Tweet': x[1], 'Handle': x[2]}, fake_tweets))
+			return list(map(lambda x: {'ID': str(x[0]), 'Tweet': x[1], 'Handle': x[2]}, fake_tweets))
 	
 
 def error(err):
