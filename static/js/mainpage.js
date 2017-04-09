@@ -42,6 +42,9 @@ function newGame() {
 
 $(document).ready(function() {
 	score = 0;
+	setInterval(function() {
+		$('#score').html(score);
+	},500);
 
 	for (var i = 0; i < num_fake_tweets+1; i++) {
 		var newChoice = document.createElement('button');
