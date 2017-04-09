@@ -1,5 +1,6 @@
 from sanic import Sanic, response
 from sanic.response import json, text
+from sanic_session import InMemorySessionInterface
 
 from twilio.twiml.voice_response import VoiceResponse
 
@@ -12,15 +13,21 @@ import random
 con = mdb.connect('localhost', 'root', 'password1', 'unstumpable')
 
 app = Sanic()
+session = InMemorySessionInterface()
+
+# https://github.com/subyraman/sanic_session
+@app.middleware('request')
+async def add_session_to_request(request):
+	await session.open(request)
+
+# https://github.com/subyraman/sanic_session
+@app.middleware('response')
+async def save_session(request, response):
+	await session.save(request, response)
 
 @app.route('/')
 async def test(request):
-	#return json({'hello': 'world'})
 	return await response.file('./static/templates/mainpage.html')
-
-#@app.route('/static/js/mainpage.js')
-#async def get_js(request):
-#	return await response.file('./static/js/mainpage.js')
 
 app.static('/js', './static/js')
 app.static('/css', './static/css')
@@ -51,36 +58,50 @@ async def get_tweets(request, methods=['GET']):
 
 @app.route('/get_tweets_mobile')
 async def get_tweets_mobile(request, methods=['GET','POST']):
-	print(" [*] REQUEST RECEIVED AT /get_tweets")
+	print(" [*] REQUEST RECEIVED AT /get_tweets_mobile")
 
 	num_fake_tweets = 3
 
-	resp = VoiceResponse()
+	#ca = request.cookies.get('correct_answer')
+	ca = request['session'].get('correct_answer')
+	print(ca)
+	if ca == None:
+		print(" [*] Starting new game.")
+		real_tweet = get_real_tweet()
+		if not real_tweet:
+			return text("Cannot get real tweet")
+		
+		fake_tweets = get_fake_tweets(num_fake_tweets)
+		if not fake_tweets:
+			return text("Cannot get fake tweets")
+		
+		tweets = fake_tweets
+		random.shuffle(tweets)
+		correct_index = random.randint(0,num_fake_tweets)
+		#request.cookies['correct_answer'] = correct_index
+		request['session']['correct_answer'] = correct_index
+		tweets.insert(correct_index,real_tweet)
 
-	real_tweet = get_real_tweet()
-	if not real_tweet:
-		#resp.message("Cannot get real tweet")
-		#return str(resp)
-		return text("Cannot get real tweet")
-	
-	fake_tweets = get_fake_tweets(num_fake_tweets)
-	if not fake_tweets:
-		#resp.message("cannot get fake tweets")
-		#return str(resp)
-		return text("Cannot get fake tweets")
-	
-	tweets = fake_tweets
-	random.shuffle(tweets)
-	correct_index = random.randint(0,num_fake_tweets)
-	tweets.insert(correct_index,real_tweet)
+		resp_str = "Which tweet is the real tweet?\n"
+		for i,tweet in enumerate(tweets):
+			resp_str += '%d) %s\n' % (i,tweet)
 
-	resp_str = "Which tweet is the real tweet?\n"
-	for i,tweet in enumerate(tweets):
-		resp_str += '%d) %s\n' % (i,tweet)
-
-	#resp.message(resp_str)
-	#return str(resp)
-	return text(resp_str)
+		return text(resp_str)
+	else:
+		print(" [*] Existing game found.")
+		#ca = int(request.cookies.get('correct_answer'))
+		ca = int(request['session'].get('correct_answer'))
+		body = request.args['Body'][0]
+		try:
+			user_answer = int(body)
+			if user_answer == ca:
+				#request.cookies['correct_answer'] = None
+				request['session']['correct_answer'] = None
+				return text("Correct! Make HackNY Great Again")
+			else:
+				return text("Fake news! Bad!")
+		except:
+			return text("Invalid input. Please try again")
 
 def get_real_tweet():
 	real_tweet_q = "SELECT ID, Tweet FROM real_tweets ORDER BY RAND() LIMIT 1;"
