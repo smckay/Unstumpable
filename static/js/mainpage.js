@@ -2,6 +2,7 @@ const num_fake_tweets = 3;
 
 var correctAnswer;
 var indexes;
+var tweets;
 
 var realid;
 
@@ -23,18 +24,19 @@ function resetColors() {
 }
 
 function newGame() {
-	$('#remove').remove();
-	indexes = Array.from(Array(num_fake_tweets+1).keys());
-	shuffle(indexes);
+	$('.remove').remove();
+	//$('.choice').next().remove();
 	resetColors();
 	$.get('/get_tweets?num_tweets=' + num_fake_tweets, function(data) {
-		var fake_tweets = data.fake_tweets;
-		realid = data.real_tweet.ID;
-		for (var i = 0; i < fake_tweets.length; i++) {
-			$('#choice_' + indexes[i]).html(fake_tweets[i].Tweet);
+		tweets = data.fake_tweets;
+		tweets.push(data.real_tweet);
+		shuffle(tweets);
+		for (var i = 0; i < tweets.length; i++) {
+			var tweet = tweets[i];
+			$('#choice_' + i).html(tweet.Tweet);
+			if (tweet['Handle'] == 'realDonaldTrump')
+				correctAnswer = i;
 		}
-		correctAnswer = indexes[num_fake_tweets];
-		$('#choice_' + correctAnswer).html(data.real_tweet.Tweet);
 	})
 	.done(function() {
 		console.log("Sending request to server...");
@@ -69,11 +71,29 @@ $(document).ready(function() {
 			//alert("Correct! Make HackNY Great Again!");
 			score += 1;
 			console.log(realid);
-			var url = "https://twitter.com/realDonaldTrump/status/" + realid;
-			$(target).after('<a id="remove" href=' + url + ">Think it's fake news? See the original tweet!</a>");
-			//$.get('/embed?id=' + realid, function(data) {
-			//	console.log(data.html);
-			//});
+			//var url = "https://twitter.com/realDonaldTrump/status/" + realid;
+			var url = "https://twitter.com/realDonaldTrump/status/"; 
+			//$(target).after('<a id="remove" href=' + url + ">Think it's fake news? See the original tweet!</a>");
+			$('.choice').each(function(index) {
+				var tweet = tweets[index];
+				$.get('/embed?id=' + tweet['ID'], function(data) {
+					console.log(data.html);
+					$('#choice_' + index).after('<span class="remove">' + data.html + '</span>');
+				});
+			});
+
+			/*
+			for (var tweet_index = 0; tweet_index < tweets.length; tweet_index++) {
+				var tweet = tweets[tweet_index];
+//				$('#choice_' + i).after('<a class="remove" href=' + url + tweet['ID'] + ">Click here to see the original tweet!</a>");
+				console.log(tweet_index);
+				$.get('/embed?id=' + tweet['ID'], function(data) {
+					console.log(tweet_index);
+					console.log(data.html);
+					$('#choice_' + tweet_index).after('<span class="remove">' + data.html + '</span>');
+				});
+			}
+			*/
 			$('.choice').prop('disabled', true);
 		} else {
 			target.style.backgroundColor = "#FF0000";

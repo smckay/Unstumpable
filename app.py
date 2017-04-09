@@ -84,9 +84,9 @@ async def get_tweets_mobile(request, methods=['GET','POST']):
 		request['session']['correct_answer'] = correct_index
 		tweets.insert(correct_index,real_tweet)
 
-		resp_str = "Which tweet is the real tweet?\n"
+		resp_str = "One of these Tweets is from @realDonaldTrump. The others are parody accounts. Which tweet is the real tweet?\n"
 		for i,tweet in enumerate(tweets):
-			resp_str += '%d) %s\n' % (i,tweet['Tweet'].decode('utf-8'))
+			resp_str += '\n%d) %s\n' % (i,tweet['Tweet'].decode('utf-8'))
 
 		return text(resp_str)
 	else:
@@ -97,7 +97,7 @@ async def get_tweets_mobile(request, methods=['GET','POST']):
 			if user_answer == ca:
 				request['session']['correct_answer'] = None
 				request['session']['score'] = request['session'].get('score', 0)+1
-				return text("Correct! Make HackNY Great Again")
+				return text("Correct! Make HackNY Great Again\n\nCurrent Score: %d" % request['session']['score'])
 			else:
 				request['session']['score'] = 0
 				return text("Fake news! Bad!")
@@ -111,8 +111,8 @@ async def embed(request, methods=['GET']):
         print("PARAMETER 'id': %d" % (id))
         ret = requests.get("https://api.twitter.com/1.1/statuses/oembed.json?id=" + str(id));
         ret = ret.json()
-        print(ret['html'])
-        return {'html': ret['html']}
+        ret['html'] = ret['html'].replace('\n', '')
+        return json({'html': ret['html']})
 
 def get_real_tweet():
 	real_tweet_q = "SELECT ID, Tweet FROM real_tweets ORDER BY RAND() LIMIT 1;"
