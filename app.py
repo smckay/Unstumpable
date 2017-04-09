@@ -4,6 +4,7 @@ from sanic.response import json
 from twilio.twiml.voice_response import VoiceResponse
 
 import pymysql as mdb
+import requests
 
 from pdb import set_trace
 
@@ -50,6 +51,16 @@ async def get_tweets(request, methods=['GET']):
 @app.route('/get_tweets_mobile')
 async def get_tweets_mobile(request, methods=['GET','POST']):
 	pass
+
+@app.route('/embed')
+async def embed(request, methods=['GET']):
+        print(" [*] REQUEST RECEIVED AT /embed")
+        id = int(request.args['id'][0])
+        print("PARAMETER 'id': %d" % (id))
+        ret = requests.get("https://api.twitter.com/1.1/statuses/oembed.json?id=" + str(id));
+        ret = ret.json()
+        print(ret['html'])
+        return {'html': ret['html']}
 
 def get_real_tweet():
 	real_tweet_q = "SELECT ID, Tweet FROM real_tweets ORDER BY RAND() LIMIT 1;"

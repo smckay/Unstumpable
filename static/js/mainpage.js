@@ -3,6 +3,8 @@ const num_fake_tweets = 3;
 var correctAnswer;
 var indexes;
 
+var realid;
+
 var score;
 
 // http://stackoverflow.com/a/6274381
@@ -21,11 +23,13 @@ function resetColors() {
 }
 
 function newGame() {
+	$('#remove').remove();
 	indexes = Array.from(Array(num_fake_tweets+1).keys());
 	shuffle(indexes);
 	resetColors();
 	$.get('/get_tweets?num_tweets=' + num_fake_tweets, function(data) {
 		var fake_tweets = data.fake_tweets;
+		realid = data.real_tweet.ID;
 		for (var i = 0; i < fake_tweets.length; i++) {
 			$('#choice_' + indexes[i]).html(fake_tweets[i].Tweet);
 		}
@@ -60,6 +64,12 @@ $(document).ready(function() {
 		        target.style.backgroundColor = "#00FF00";			
 			//alert("Correct! Make HackNY Great Again!");
 			score += 1;
+			console.log(realid);
+			var url = "https://twitter.com/realDonaldTrump/status/" + realid;
+			$(target).after('<a id="remove" href=' + url + ">Think it's fake news? See the original tweet!</a>");
+			//$.get('/embed?id=' + realid, function(data) {
+			//	console.log(data.html);
+			//});
 		} else {
 			target.style.backgroundColor = "#FF0000";
 			//alert("Fake news! Bad!");
